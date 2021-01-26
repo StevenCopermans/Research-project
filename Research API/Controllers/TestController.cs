@@ -24,11 +24,14 @@ namespace Research_API.Controllers
     {
         private readonly CMS_DBContext _context;
         private readonly Content_DBContext _contentContext;
+        private static string connectionString = null;
 
         public TestController(CMS_DBContext context, Content_DBContext contentContext)
         {
             this._context = context;
             this._contentContext = contentContext;
+            if (connectionString == null)
+                connectionString = "Server=.\\SQLEXPRESS;Database=Pizza_DB;Trusted_Connection=True; MultipleActiveResultSets=true";
             Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
         }
 
@@ -50,6 +53,17 @@ namespace Research_API.Controllers
             }
 
             return tableList;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<string>> SetConnectionString(object jsonObject)
+        {
+            JObject parsedObject = JObject.Parse(jsonObject.ToString());
+            connectionString = (string)parsedObject["connectionString"];
+
+            Console.WriteLine(connectionString);
+
+            return NoContent();
         }
 
         [HttpGet("{table}")]
@@ -77,7 +91,7 @@ namespace Research_API.Controllers
                 Console.WriteLine(body);
 
                 string whereStatement = "";
-                if (parameters.Count > 0) 
+                if (parameters.Count > 0)
                 {
                     var structureList = await ExecuteSqlQuery("SELECT columns.COLUMN_NAME, IS_NULLABLE, DATA_TYPE, t2.CONSTRAINT_TYPE FROM INFORMATION_SCHEMA.COLUMNS as columns LEFT JOIN(SELECT col.COLUMN_NAME, CONSTRAINT_TYPE from INFORMATION_SCHEMA.TABLE_CONSTRAINTS Tab, INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE Col WHERE Col.Constraint_Name = Tab.Constraint_Name AND Col.Table_Name = Tab.Table_Name AND Col.Table_Name = '" + table + "') as t2 ON columns.COLUMN_NAME = t2.COLUMN_NAME WHERE TABLE_NAME = '" + table + "'");
 
@@ -240,7 +254,7 @@ namespace Research_API.Controllers
                         Console.WriteLine("Insufficient data");
                         errors.Add("Insufficient data");
                         Console.WriteLine(JsonConvert.SerializeObject(new { errors = errors }));
-                        
+
                         return BadRequest(JsonConvert.SerializeObject(new { errors = errors }));
                     }
                 }
@@ -258,7 +272,7 @@ namespace Research_API.Controllers
 
                 //Identity Column(s)
                 var identityColumns = await ExecuteSqlQuery("select COLUMN_NAME, TABLE_NAME from INFORMATION_SCHEMA.COLUMNS where (COLUMNPROPERTY(object_id('" + table + "'), COLUMN_NAME, 'IsRowGuidCol') = 1 AND TABLE_NAME='" + table + "') Or (COLUMNPROPERTY(object_id('" + table + "'), COLUMN_NAME, 'IsIdentity') = 1 AND TABLE_NAME='" + table + "') order by TABLE_NAME ");
-                
+
                 List<string> warnings = new List<string>();
 
                 string propertiesString = "";
@@ -313,7 +327,7 @@ namespace Research_API.Controllers
                     propertiesString = propertiesString.Remove(propertiesString.Length - 1, 1);
                     valuesString = valuesString.Remove(valuesString.Length - 1, 1);
                 }
-                
+
                 if (errors.Count > 0)
                 {
                     return BadRequest(JsonConvert.SerializeObject(new { errors = errors, warnings = warnings }));
@@ -419,7 +433,7 @@ namespace Research_API.Controllers
                 {
                     string query = "UPDATE " + table + " SET ";
 
-                    foreach(var property in propertyList)
+                    foreach (var property in propertyList)
                     {
                         query += property.Key + "='" + property.Value + "',";
                     }
@@ -443,7 +457,8 @@ namespace Research_API.Controllers
 
         private async Task<(int count, List<IDictionary<string, object>> rows)> ExecuteSqlQuery(string query)
         {
-            this._contentContext.Database.GetDbConnection().ConnectionString = "Server=.\\SQLEXPRESS;Database=Pizza_DB;Trusted_Connection=True; MultipleActiveResultSets=true";
+            Console.WriteLine(connectionString);
+            this._contentContext.Database.GetDbConnection().ConnectionString = connectionString;
             this._contentContext.Database.OpenConnection();
 
             using (var command = this._contentContext.Database.GetDbConnection().CreateCommand())
