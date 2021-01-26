@@ -1,0 +1,69 @@
+﻿.c-backdrop {
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: RGBA(0,0,0,0.5);
+
+    display: flex;
+    justify-content: center;
+    justify-items: center;
+    align-content: center;
+    align-items: center;
+}
+
+.c-container {
+    width: 900px;
+    height: 90vh;
+    position: relative;
+    left: 0;
+    top: 0;
+    background-color: #fff;
+}
+
+.c-header {
+    width: 100%;
+    border-bottom: 1px solid grey;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+}
+
+.c-form {
+    width: 100%;
+    padding: 8px 16px;
+}
+
+.c-cross {
+    padding: 0;
+    width: 20px;
+    height: 20px;
+}
+
+.c-label {
+    margin-right: 16px;
+    font-weight: bold;
+}
+
+.c-input {
+    margin-bottom: 24px;
+}
+
+.c-input input {
+    width: 100%;
+}
+
+.c-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 8px 16px;
+    text-align: right;
+}
+
+.c-errorContainer {
+    margin: 8px 16px;
+    color: red;
+}

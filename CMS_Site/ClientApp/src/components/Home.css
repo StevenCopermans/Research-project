@@ -1,0 +1,29 @@
+﻿.c-Right {
+    width: 100%;
+}
+
+.c-content {
+    padding: 0 24px;
+}
+
+.c-tableName {
+
+}
+
+.c-tableNameList {
+    list-style-type: none;
+    margin: 0 8px;
+    padding: 0;
+}
+
+.c-normal {
+    width: 100%;
+    height: 100%;
+}
+
+.c-modal {
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden;
+    position: fixed;
+}
