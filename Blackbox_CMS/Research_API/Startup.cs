@@ -8,10 +8,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using Research_API.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Research_API
 {
@@ -27,22 +27,8 @@ namespace Research_API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddControllers();
-
-            var connectionString = Configuration.GetConnectionString("CMS_DB");
-            services.AddDbContext<CMS_DBContext>(options => options.UseSqlServer(connectionString));
-            services.AddDbContext<Content_DBContext>(options => options.UseSqlServer("Server=.;Database=Pizza_DB;Trusted_Connection=True;Integrated Security=True;MultipleActiveResultSets=true"));
-
-            //CORS
-            services.AddCors(options =>
-            {
-                options.AddPolicy("MyAllowOrigins", builder =>
-                {
-                    builder.AllowAnyMethod()
-                   .AllowAnyHeader()
-                   .AllowAnyOrigin();
-                });
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,7 +42,6 @@ namespace Research_API
             app.UseHttpsRedirection();
 
             app.UseRouting();
-            app.UseCors("MyAllowOrigins");
 
             app.UseAuthorization();
 
