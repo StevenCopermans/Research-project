@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using BlackboxData.Models;
+using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
@@ -18,13 +19,9 @@ namespace Research_API.Controllers
     public class rest : ControllerBase
     {
         private const string connectionString = "Data Source=(local);Initial Catalog=Cinema_DB;Integrated Security=true";
+
         private static SqlConnection sqlConnection = new SqlConnection(connectionString);
 
-        public class Table
-        {
-            public string Name { get; set; }
-            public string Schema { get; set; }
-        }
 
         // GET: api/<rest>
         [HttpGet]
@@ -33,30 +30,20 @@ namespace Research_API.Controllers
             return Ok(JsonConvert.SerializeObject(await GetTablesAsync()));
         }
 
-        public async Task<List<Table>> GetTablesAsync()
+        public async Task<IEnumerable<Table>> GetTablesAsync()
         {
-            sqlConnection.Open();
-            var tablesQuery = await sqlConnection.GetSchemaAsync("Tables");
-            sqlConnection.Close();
-
-            List<Table> tables = new List<Table>();
-            foreach (DataRow row in tablesQuery.Rows)
+            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
             {
-                tables.Add(new Table
-                {
-                    Name = (string)row[tablesQuery.Columns.IndexOf("TABLE_NAME")],
-                    Schema = (string)row[tablesQuery.Columns.IndexOf("TABLE_SCHEMA")],
-                });
+                IEnumerable<Table> tablesQuery = await sqlConnection.QueryAsync<Table>("SELECT [i].[TABLE_CATALOG] as 'Catalog', [i].[TABLE_NAME] as 'Name', [i].[TABLE_SCHEMA] as 'Schema', [i].[TABLE_TYPE] as 'Type' FROM INFORMATION_SCHEMA.TABLES as i;");
+                return tablesQuery;
             }
-
-            return tables;
         }
 
         [HttpGet("{table}")]
         public async Task<ActionResult<string>> GetTableByName(string table)
         {
             Console.WriteLine(table);
-            List<Table> tables = await GetTablesAsync();
+            List<Table> tables = await GetTablesAsync() as List<Table>;
 
             if (tables.FirstOrDefault(x => x.Name == table) == null)
                 return NotFound();
@@ -74,7 +61,7 @@ namespace Research_API.Controllers
         public async Task<ActionResult<string>> GetTableByName(string table, string id)
         {
             Console.WriteLine(id);
-            List<Table> tables = await GetTablesAsync();
+            List<Table> tables = await GetTablesAsync() as List<Table>;
 
             if (tables.FirstOrDefault(x => x.Name == table) == null)
                 return NotFound();
@@ -83,7 +70,18 @@ namespace Research_API.Controllers
             if (primaryKeys.Count > 1)
                 return NotFound(new { message = "The table you're trying to acces has more than 1 primary key, please use a query url", primaryKeys = primaryKeys });
 
+            DataTable columns = await GetColumnsAsync(table);
 
+            DataRowCollection a = columns.Rows;
+
+
+            try
+            {
+                dynamic convertedId = ConvertStringToType(id, "");
+            } catch (NotImplementedException e)
+            {
+                return BadRequest();
+            }
 
 
 
@@ -113,6 +111,7 @@ namespace Research_API.Controllers
             return Ok(JsonConvert.SerializeObject(await GetPrimaryKeys(table)));
         }
 
+        [HttpGet("pk/{table}")]
         public async Task<List<string>> GetPrimaryKeys(string table)
         {
             sqlConnection.Open();
