@@ -2,6 +2,7 @@
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Research_API.Repositories;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,20 +23,16 @@ namespace Research_API.Controllers
 
         private static SqlConnection sqlConnection = new SqlConnection(connectionString);
 
+        private Func<SqlConnection, Task<IEnumerable<Table>>> GetTablesAsync = async x => await InformationSchemeHelper.GetTablesAsync(x);
+
 
         // GET: api/<rest>
         [HttpGet]
         public async Task<ActionResult<string>> GetTables()
         {
-            return Ok(JsonConvert.SerializeObject(await GetTablesAsync()));
-        }
-
-        public async Task<IEnumerable<Table>> GetTablesAsync()
-        {
             using (SqlConnection sqlConnection = new SqlConnection(connectionString))
             {
-                IEnumerable<Table> tablesQuery = await sqlConnection.QueryAsync<Table>("SELECT [i].[TABLE_CATALOG] as 'Catalog', [i].[TABLE_NAME] as 'Name', [i].[TABLE_SCHEMA] as 'Schema', [i].[TABLE_TYPE] as 'Type' FROM INFORMATION_SCHEMA.TABLES as i;");
-                return tablesQuery;
+                return Ok(JsonConvert.SerializeObject(await GetTablesAsync(sqlConnection)));
             }
         }
 
@@ -43,27 +40,30 @@ namespace Research_API.Controllers
         public async Task<ActionResult<string>> GetTableByName(string table)
         {
             Console.WriteLine(table);
-            List<Table> tables = await GetTablesAsync() as List<Table>;
 
-            if (tables.FirstOrDefault(x => x.Name == table) == null)
+            if (!(await InformationSchemeHelper.TableExistsAsync(sqlConnection, table)))
                 return NotFound();
 
-            sqlConnection.Open();
-
-            var result = sqlConnection.Query(string.Format("SELECT * FROM [{0}]", table));
-
-            sqlConnection.Close();
-
-            return Ok(JsonConvert.SerializeObject(result));
+            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+            {
+                var result = await sqlConnection.QueryAsync(string.Format("SELECT * FROM [{0}]", table));
+                return Ok(JsonConvert.SerializeObject(result));
+            }
+            
         }
 
         [HttpGet("{table}/{id}")]
         public async Task<ActionResult<string>> GetTableByName(string table, string id)
         {
             Console.WriteLine(id);
-            List<Table> tables = await GetTablesAsync() as List<Table>;
+            List<Table> tables;
 
-            if (tables.FirstOrDefault(x => x.Name == table) == null)
+            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+            {
+                tables = await GetTablesAsync(sqlConnection) as List<Table>;
+            }
+
+            if (tables.FirstOrDefault(x => x.TABLE_NAME == table) == null)
                 return NotFound();
 
             List<string> primaryKeys = await GetPrimaryKeys(table);

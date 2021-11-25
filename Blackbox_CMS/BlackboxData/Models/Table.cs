@@ -8,9 +8,9 @@ namespace BlackboxData.Models
 {
     public class Table
     {
-        public string Catalog { get; set; }
-        public string Schema { get; set; }
-        public string Name { get; set; }
-        public string Type { get; set; }
+        public string TABLE_CATALOG { get; set; }
+        public string TABLE_SCHEMA { get; set; }
+        public string TABLE_NAME { get; set; }
+        public string TABLE_TYPE { get; set; }
     }
 }
