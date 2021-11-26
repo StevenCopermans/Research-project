@@ -23,17 +23,14 @@ namespace Research_API.Controllers
 
         private static SqlConnection sqlConnection = new SqlConnection(connectionString);
 
-        private Func<SqlConnection, Task<IEnumerable<Table>>> GetTablesAsync = async x => await InformationSchemeHelper.GetTablesAsync(x);
+        private InformationSchemeHelper schemeHelper = new InformationSchemeHelper(connectionString);
 
 
         // GET: api/<rest>
         [HttpGet]
         public async Task<ActionResult<string>> GetTables()
         {
-            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
-            {
-                return Ok(JsonConvert.SerializeObject(await GetTablesAsync(sqlConnection)));
-            }
+            return Ok(JsonConvert.SerializeObject(await schemeHelper.GetTablesAsync()));
         }
 
         [HttpGet("{table}")]
@@ -41,7 +38,7 @@ namespace Research_API.Controllers
         {
             Console.WriteLine(table);
 
-            if (!(await InformationSchemeHelper.TableExistsAsync(sqlConnection, table)))
+            if (!(await schemeHelper.TableExistsAsync(table)))
                 return NotFound();
 
             using (SqlConnection sqlConnection = new SqlConnection(connectionString))
@@ -58,10 +55,7 @@ namespace Research_API.Controllers
             Console.WriteLine(id);
             List<Table> tables;
 
-            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
-            {
-                tables = await GetTablesAsync(sqlConnection) as List<Table>;
-            }
+            tables = await schemeHelper.GetTablesAsync() as List<Table>;
 
             if (tables.FirstOrDefault(x => x.TABLE_NAME == table) == null)
                 return NotFound();

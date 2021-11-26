@@ -9,4 +9,9 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BlackboxData\BlackboxData.csproj" />
+    <ProjectReference Include="..\Research_API\Research_API.csproj" />
+  </ItemGroup>
+
 </Project>

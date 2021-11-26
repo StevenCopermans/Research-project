@@ -8,17 +8,27 @@ using System.Threading.Tasks;
 
 namespace Research_API.Repositories
 {
-    public static class InformationSchemeHelper
+    public class InformationSchemeHelper
     {
-        public static async Task<IEnumerable<Table>> GetTablesAsync(SqlConnection sqlConnection)
+        private static string _connectionString;
+
+        public InformationSchemeHelper(string connectionString)
         {
-            IEnumerable<Table> tablesQuery = await sqlConnection.QueryAsync<Table>("SELECT * FROM INFORMATION_SCHEMA.TABLES;");
-            return tablesQuery;
+            _connectionString = connectionString;
         }
 
-        public static async Task<bool> TableExistsAsync(SqlConnection sqlConnection, string table)
+        public async Task<IEnumerable<Table>> GetTablesAsync()
         {
-            var tables = await GetTablesAsync(sqlConnection);
+            using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
+            {
+                IEnumerable<Table> tablesQuery = await sqlConnection.QueryAsync<Table>("SELECT * FROM INFORMATION_SCHEMA.TABLES;");
+                return tablesQuery;
+            }
+        }
+
+        public async Task<bool> TableExistsAsync(string table)
+        {
+            var tables = await GetTablesAsync();
             if (tables.FirstOrDefault(x => x.TABLE_NAME == table) == null)
                 return false;
             return true;
