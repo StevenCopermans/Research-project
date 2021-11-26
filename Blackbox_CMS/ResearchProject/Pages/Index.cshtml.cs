@@ -14,7 +14,6 @@ namespace ResearchProject.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         public IEnumerable<Table> tables = new List<Table>() { new Table(){ TABLE_NAME = "TEST" } };
-        public string test = "Hello world";
 
         public IndexModel(ILogger<IndexModel> logger)
         {
