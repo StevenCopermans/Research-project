@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Research_API", "Research_AP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Research_API.Test", "Research_API.Test\Research_API.Test.csproj", "{9D169378-15F8-4A54-B190-4ABD69CB3953}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackboxData", "BlackboxData\BlackboxData.csproj", "{1D5CD963-3574-4187-82C0-CB258C8C6E13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackboxData", "BlackboxData\BlackboxData.csproj", "{1D5CD963-3574-4187-82C0-CB258C8C6E13}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

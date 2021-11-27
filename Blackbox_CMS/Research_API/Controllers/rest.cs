@@ -74,6 +74,7 @@ namespace Research_API.Controllers
                 dynamic convertedId = ConvertStringToType(id, "");
             } catch (NotImplementedException e)
             {
+                Console.WriteLine(e);
                 return BadRequest();
             }
 
@@ -176,7 +177,7 @@ namespace Research_API.Controllers
         [HttpGet("test")]
         public async Task<ActionResult<string>> test()
         {
-            return JsonConvert.SerializeObject(GetDataTypes());
+            return JsonConvert.SerializeObject(await GetDataTypes());
 
             //return NotFound();
                
