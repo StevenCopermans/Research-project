@@ -27,7 +27,7 @@ namespace Research_API.Controllers
 
 
         // GET: api/<rest>
-        [HttpGet]
+        [HttpGet("GetTables")]
         public async Task<ActionResult<string>> GetTables()
         {
             return Ok(JsonConvert.SerializeObject(await schemeHelper.GetTablesAsync()));

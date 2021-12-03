@@ -25,18 +25,19 @@ namespace ResearchProject
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        private readonly string _policyName = "CorsPolicy";
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
 
             //CORS
-            services.AddCors(options =>
+            services.AddCors(opt =>
             {
-                options.AddPolicy("MyAllowOrigins", builder =>
+                opt.AddPolicy(name: _policyName, builder =>
                 {
-                    builder.AllowAnyMethod()
-                   .AllowAnyHeader()
-                   .AllowAnyOrigin();
+                    builder.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
                 });
             });
         }
@@ -59,7 +60,7 @@ namespace ResearchProject
             app.UseStaticFiles();
 
             app.UseRouting();
-            app.UseCors("MyAllowOrigins");
+            app.UseCors(_policyName);
 
             app.UseAuthorization();
 
