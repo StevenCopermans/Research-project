@@ -31,7 +31,7 @@ namespace Research_API
 
             var connectionString = Configuration.GetConnectionString("CMS_DB");
             services.AddDbContext<CMS_DBContext>(options => options.UseSqlServer(connectionString));
-            services.AddDbContext<Content_DBContext>(options => options.UseSqlServer("Server=.;Database=Pizza_DB;Trusted_Connection=True;Integrated Security=True;MultipleActiveResultSets=true"));
+            services.AddDbContext<Content_DBContext>(options => options.UseSqlServer("Server=localhost;Database=Cinema_DB;Trusted_Connection=True;Integrated Security=True;MultipleActiveResultSets=true"));
 
             //CORS
             services.AddCors(options =>

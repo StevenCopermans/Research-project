@@ -31,7 +31,7 @@ namespace Research_API.Controllers
             this._context = context;
             this._contentContext = contentContext;
             if (connectionString == null)
-                connectionString = "Server=.\\SQLEXPRESS;Database=Pizza_DB;Trusted_Connection=True; MultipleActiveResultSets=true";
+                connectionString = "Server=localhost;Database=Cinema_DB;Trusted_Connection=True; MultipleActiveResultSets=true";
             Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
         }
 
@@ -459,6 +459,9 @@ namespace Research_API.Controllers
         {
             Console.WriteLine(connectionString);
             this._contentContext.Database.GetDbConnection().ConnectionString = connectionString;
+
+
+
             this._contentContext.Database.OpenConnection();
 
             using (var command = this._contentContext.Database.GetDbConnection().CreateCommand())
