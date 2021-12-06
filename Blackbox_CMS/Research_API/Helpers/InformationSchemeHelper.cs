@@ -32,5 +32,21 @@ namespace Research_API.Repositories
                 return false;
             return true;
         }
+
+        public async Task<IEnumerable<dynamic>> GetTableStructure(string table)
+        {
+            List<dynamic> result = new List<dynamic>();
+            using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
+            {
+                var tableStructure = await sqlConnection.QueryMultipleAsync("sp_help @table_name", new { table_name = table });
+
+                while(!tableStructure.IsConsumed)
+                {
+                    result.Add(tableStructure.Read());
+                }
+
+                return result;
+            }
+        }
     }
 }

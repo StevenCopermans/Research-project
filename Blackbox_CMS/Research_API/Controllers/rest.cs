@@ -25,6 +25,11 @@ namespace Research_API.Controllers
 
         private InformationSchemeHelper schemeHelper = new InformationSchemeHelper(connectionString);
 
+        [HttpGet]
+        public async Task<ActionResult<string>> GetTableStructure()
+        {
+            return Ok(JsonConvert.SerializeObject(await schemeHelper.GetTableStructure("Movie")));
+        }
 
         // GET: api/<rest>
         [HttpGet("GetTables")]
